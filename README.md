@@ -7,6 +7,6 @@ A baby blue pixel-art birthday platformer made for Medo. Run, jump, collect flow
 **Controls:** arrow keys or A/D to move, Up / W / Space to jump, P or Esc to pause, M for music.
 On a phone, slide your thumb on the left pad to move and tap JUMP.
 
-**Music:** put the song file at `assets/song.mp3` and it plays from the moment you press START. The song is not included in this public repo. Without the file, the music bar falls back to the Spotify player.
+**Music:** `assets/song.mp3` (honeybee by Olivia Rodrigo) plays from the moment you press START and keeps going across every screen. Keep the `assets` folder next to `index.html`. `Medo-Birthday-Garden-standalone.html` is the same game with the song built into the file, so it works on its own.
 
-**Folders:** `index.html` is the game, `assets/` has Medo's original pixel art and animation sheet, `source/` has the build scripts.
+**Folders:** `index.html` is the game, `Medo-Birthday-Garden-standalone.html` is the one-file version, `assets/` has Medo's original pixel art and animation sheet, `source/` has the build scripts.
