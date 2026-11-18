@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#bfe3ff">
+<title>Medo's Birthday Garden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#3c6fae;--blue:#8ec8f5;--deep:#5aa5e6;--pale:#dff0ff;--s:2;--pu:1.75;--sx:0px;--sy:0px;--sw:640px;--sh:360px;--k:2;--mk:1.4;--lw:360px;--ew:200px;--EH:123px;--fs:22px;--dpw:176px;--dph:68px;--jmp:80px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;overflow:hidden;font-family:'Press Start 2P',monospace;color:var(--ink);overscroll-behavior:none}
+body{background:linear-gradient(#bfe3ff,#eef7ff) fixed;touch-action:none}
+.hidden{display:none!important}
+svg.ic{display:block;width:100%;height:100%}
+button{font-family:inherit}
+button:focus-visible{outline:3px solid #fff;outline-offset:2px;box-shadow:0 0 0 6px var(--ink)}
+
+/* ---- stage ---- */
+#stage{position:absolute;left:var(--sx);top:var(--sy);width:var(--sw);height:var(--sh);overflow:hidden;box-shadow:0 0 0 3px #fff,0 0 0 6px #9fd0f5,0 10px 40px rgba(90,165,230,.35);border-radius:3px;background:#cfe8fb}
+canvas#c{width:100%;height:100%;display:block;image-rendering:crisp-edges;image-rendering:pixelated}
+.pbtn{font-size:max(9px,calc(var(--s)*7px));color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:4px;padding:.95em 1.3em;cursor:pointer;box-shadow:0 4px 0 #9fd0f5;letter-spacing:.04em;touch-action:manipulation;display:inline-flex;align-items:center;gap:.7em;line-height:1}
+.pbtn:hover{background:var(--pale)}
+.pbtn:active{transform:translateY(3px);box-shadow:0 1px 0 #9fd0f5}
+.pbtn.big{font-size:max(11px,calc(var(--s)*9px))}
+.pbtn .ic{width:1.2em;height:1em;color:#ff8fbb}
+#titleUi{position:absolute;left:0;right:0;top:63%;text-align:center;padding-left:34%}
+#titleUi .pbtn{animation:bob 1.2s steps(2) infinite}
+@keyframes bob{50%{transform:translateY(-3px)}}
+#pauseUi{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2em;z-index:6;background:rgba(223,240,255,.8)}
+#pauseUi h2{font-size:max(14px,calc(var(--s)*12px));margin:0 0 .4em;text-shadow:3px 3px 0 #fff}
+
+/* ---- top bar: music player + sound + pause ---- */
+#topbar{position:fixed;z-index:30;display:flex;align-items:stretch;gap:calc(var(--pu)*3px);top:calc(var(--sy) + var(--pu)*3px);right:calc(var(--sx) + var(--pu)*3px)}
+body.portrait #topbar{top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;right:auto;transform:translateX(-50%);width:min(94vw,470px)}
+#music{position:relative;display:flex;align-items:center;gap:calc(var(--pu)*3.5px);width:calc(var(--pu)*130px);height:calc(var(--pu)*17px);padding:0 calc(var(--pu)*3.5px) 0 calc(var(--pu)*2px);background:#fff;border:max(2px,calc(var(--pu)*1.3px)) solid var(--ink);border-radius:calc(var(--pu)*3px);box-shadow:0 max(2px,calc(var(--pu)*1.3px)) 0 #9fd0f5;overflow:hidden}
+body.portrait #music{flex:1;width:auto;height:44px}
+.mbtn{flex:none;width:calc(var(--pu)*12px);height:calc(var(--pu)*12px);min-width:22px;min-height:22px;border:max(2px,calc(var(--pu)*1px)) solid var(--ink);background:var(--pale);color:var(--ink);padding:calc(var(--pu)*2.6px);border-radius:calc(var(--pu)*2px);cursor:pointer;touch-action:manipulation}
+body.portrait .mbtn{width:34px;height:34px;padding:8px}
+.mbtn:hover{background:#fff}
+#music.playing #mPlay{background:var(--blue);color:#fff}
+.minfo{min-width:0;flex:1;display:flex;flex-direction:column;gap:calc(var(--pu)*1.4px);justify-content:center}
+#mLab{font-size:max(6px,calc(var(--pu)*3.3px));letter-spacing:.06em;color:var(--deep);line-height:1;white-space:nowrap}
+.mtitle{overflow:hidden;white-space:nowrap;font-size:max(8px,calc(var(--pu)*4.7px));line-height:1.2;-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+.mtrack{display:inline-block;animation:mq 10s linear infinite;animation-play-state:paused}
+.mtrack span{padding-right:2.5em}
+#music.playing .mtrack{animation-play-state:running}
+@keyframes mq{to{transform:translateX(-50%)}}
+.eq{flex:none;display:flex;align-items:flex-end;gap:max(1px,calc(var(--pu)*.8px));height:calc(var(--pu)*9px);min-height:12px}
+.eq i{display:block;width:max(2px,calc(var(--pu)*1.8px));height:25%;background:var(--deep)}
+#music.playing .eq i{animation:eq .8s steps(5) infinite alternate}
+.eq i:nth-child(2){animation-delay:-.3s!important}.eq i:nth-child(3){animation-delay:-.55s!important}.eq i:nth-child(4){animation-delay:-.15s!important}
+@keyframes eq{0%{height:20%}100%{height:100%}}
+#hudBtns{display:flex;gap:calc(var(--pu)*3px)}
+.hb{width:calc(var(--pu)*17px);height:calc(var(--pu)*17px);min-width:34px;min-height:34px;padding:calc(var(--pu)*4px);background:#fff;color:var(--ink);border:max(2px,calc(var(--pu)*1.3px)) solid var(--ink);border-radius:calc(var(--pu)*3px);cursor:pointer;box-shadow:0 max(2px,calc(var(--pu)*1.3px)) 0 #9fd0f5;touch-action:manipulation}
+body.portrait .hb{width:44px;height:44px;padding:11px}
+.hb:hover{background:var(--pale)}.hb:active{transform:translateY(2px);box-shadow:none}
+.hb.off{opacity:.55}
+#bPause{visibility:hidden}
+body.playing #bPause{visibility:visible}
+#spBox{position:absolute;top:calc(100% + 8px);right:0;width:min(340px,94vw);background:#fff;border:3px solid var(--ink);border-radius:6px;padding:8px;box-shadow:0 4px 0 #9fd0f5;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .2s,transform .2s}
+#spBox.open{opacity:1;pointer-events:auto;transform:none}
+#spBox iframe{border:0;border-radius:8px;width:100%;height:80px;display:block}
+#spNote{font-family:'VT323',monospace;font-size:18px;line-height:1.1;margin-top:6px;text-align:center;-webkit-user-select:text;user-select:text}
+a.spl{display:block;margin-top:6px;font-size:8px;color:var(--ink);text-align:center}
+
+/* ---- touch controls ---- */
+#controls{position:fixed;left:0;right:0;bottom:0;z-index:12;display:none;justify-content:space-between;align-items:flex-end;padding:0 max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none;touch-action:none}
+body.touch.playing #controls{display:flex}
+body.portrait{--dpw:min(66vw,260px);--dph:96px;--jmp:104px}
+#dpad{pointer-events:auto;position:relative;display:flex;width:var(--dpw);height:var(--dph);background:rgba(255,255,255,.78);border:3px solid var(--ink);border-radius:var(--dph);box-shadow:0 5px 0 #9fd0f5,inset 0 0 0 3px #fff,inset 0 0 0 5px #cfe8fb;touch-action:none}
+#dpad:before{content:"";position:absolute;left:50%;top:22%;bottom:22%;width:3px;margin-left:-1.5px;background:repeating-linear-gradient(#bcdcf8 0 4px,transparent 4px 8px)}
+#dpad .arr{flex:1;display:grid;place-items:center;color:var(--ink);border-radius:var(--dph);padding:0 0}
+#dpad .arr svg{width:32%;height:auto;max-height:42%}
+#dpad .arr.on{background:var(--blue);color:#fff}
+#jumpBtn{pointer-events:auto;width:var(--jmp);height:var(--jmp);border-radius:50%;background:rgba(255,255,255,.8);border:3px solid var(--ink);box-shadow:0 5px 0 #9fd0f5,inset 0 0 0 3px #fff,inset 0 0 0 5px #cfe8fb;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:0;touch-action:none;font-size:9px;letter-spacing:.05em}
+#jumpBtn svg{width:34%;height:auto}
+#jumpBtn.on{background:var(--blue);color:#fff;transform:translateY(3px);box-shadow:0 2px 0 #9fd0f5,inset 0 0 0 3px #fff}
+
+/* ---- final birthday scene ---- */
+#final{position:fixed;inset:0;z-index:15;background:#d4ecff}
+#fbg{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.fscroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:flex;touch-action:pan-y;-webkit-overflow-scrolling:touch}
+.fin{margin:auto;width:100%;max-width:1500px;display:flex;flex-direction:column;align-items:center;gap:clamp(6px,1.4vh,16px);padding:8px max(14px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
+body.portrait .fin{padding-top:calc(env(safe-area-inset-top,0px) + 82px)}
+.ftitle{margin:0;font-weight:400;display:flex;flex-direction:column;align-items:center;line-height:1;text-align:center;--o:.075em}
+.ftitle .l1{font-size:clamp(11px,min(3.1vw,4.6vh),34px);margin-bottom:.5em}
+.ftitle .l2{font-size:clamp(24px,min(9vw,11vh),88px)}
+body.portrait .ftitle .l1{font-size:clamp(11px,4.1vw,24px)}
+.tl{display:inline-block;color:#fff;animation:hop 2.2s steps(1) infinite;animation-delay:calc(var(--i)*.11s);text-shadow:calc(var(--o)*-1) 0 var(--ink),var(--o) 0 var(--ink),0 calc(var(--o)*-1) var(--ink),0 var(--o) var(--ink),calc(var(--o)*-1) calc(var(--o)*-1) var(--ink),var(--o) calc(var(--o)*-1) var(--ink),calc(var(--o)*-1) var(--o) var(--ink),var(--o) var(--o) var(--ink),0 calc(var(--o)*2) 0 var(--deep)}
+.tl.b{color:#cfe8fb}
+@keyframes hop{0%,100%{transform:translateY(0)}6%{transform:translateY(-.14em)}12%{transform:translateY(-.22em)}18%{transform:translateY(-.1em)}24%{transform:translateY(0)}}
+.fstage{display:flex;align-items:flex-end;justify-content:center;gap:clamp(14px,3.4vw,56px);width:100%}
+body.portrait .fstage{flex-direction:column;align-items:center;gap:20px}
+.bqCol{position:relative;flex:none;width:calc(var(--k)*150px);height:calc(var(--k)*180px);transform-origin:50% 100%}
+.bqCol canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+.bqCol:after{content:"";position:absolute;left:22%;right:22%;bottom:-5px;height:calc(var(--k)*5px);background:rgba(90,165,230,.22);border-radius:50%;z-index:-1}
+.medoCol{flex:none;align-self:flex-end;padding-bottom:calc(var(--k)*3px)}
+.medoCol canvas{display:block;width:calc(var(--mk)*40px);height:calc(var(--mk)*76px);image-rendering:pixelated}
+body.portrait .medoCol{display:none}
+@media (max-width:760px){.medoCol{display:none}}
+.envCol{position:relative;flex:none;width:var(--lw);padding-bottom:calc(var(--EH)*.14)}
+.eimg{position:absolute;left:calc((var(--lw) - var(--ew))/2);width:var(--ew);height:auto;image-rendering:pixelated;pointer-events:none}
+#eBack{bottom:0;z-index:0}
+#eFront{bottom:0;z-index:3}
+#eUp{bottom:calc(var(--EH) - 2px);z-index:1}
+#eDown{bottom:calc(var(--EH) - var(--ew)*31/78);z-index:4}
+.letter{position:relative;z-index:2;transform-origin:50% 100%;background-color:#fffdf8;border:3px solid #cfe6fa;border-radius:3px;box-shadow:0 0 0 3px #fff,0 7px 0 3px rgba(90,165,230,.22);padding:calc(var(--fs)*1.2) calc(var(--fs)*1.1) calc(var(--EH)*.86 + var(--fs)*.4);
+  background-image:linear-gradient(transparent calc(100% - 1px),#d9ebfb 0),linear-gradient(90deg,transparent calc(var(--fs)*1.9),#ffc9de calc(var(--fs)*1.9),#ffc9de calc(var(--fs)*1.9 + 2px),transparent calc(var(--fs)*1.9 + 2px));
+  background-size:100% calc(var(--fs)*1.5),100% 100%;background-position:0 calc(var(--fs)*1.2),0 0;background-repeat:repeat-y,no-repeat}
+.letter .tape{position:absolute;top:calc(var(--fs)*-.7);left:50%;width:calc(var(--fs)*5);height:calc(var(--fs)*1.3);margin-left:calc(var(--fs)*-2.5);background:repeating-linear-gradient(135deg,rgba(142,200,245,.85) 0 6px,rgba(255,255,255,.75) 6px 12px);transform:rotate(-2deg);border:1px solid rgba(90,165,230,.5)}
+.paper{position:relative;font-family:'Caveat','Segoe Print','Bradley Hand','Comic Sans MS',cursive;font-weight:500;font-size:var(--fs);line-height:1.5;color:#2f5f9e;padding-left:calc(var(--fs)*1.2);-webkit-user-select:text;user-select:text}
+.ln{margin:0}
+.ln.hi{font-weight:700;font-size:1.08em}
+.ln.sign{text-align:right;font-weight:700;color:#e0709f;font-size:1.15em;padding-right:.3em}
+.w{display:inline-block;opacity:0;transform:translateY(4px);transition:opacity .35s,transform .35s}
+.w.in{opacity:1;transform:none}
+.w.hrt{width:.8em;height:.7em;color:#ff8fbb;vertical-align:-.04em;margin-left:.1em}
+.deco{position:absolute;width:.8em;height:.8em;color:#8ec8f5;opacity:.9}
+.deco.d1{right:-.1em;top:-.2em}.deco.d2{right:1.1em;top:.5em;width:.5em;height:.5em;color:#c9d3de}
+.creases i{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(120,160,200,.5),transparent);pointer-events:none}
+.creases i:nth-child(1){top:33%}.creases i:nth-child(2){top:62%}
+#fBtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+#fBtns .pbtn{font-size:clamp(10px,2.4vmin,13px)}
+@media (prefers-reduced-motion:reduce){.tl,.mtrack,#titleUi .pbtn{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" width="640" height="360"></canvas>
+  <div id="titleUi"><button id="startBtn" class="pbtn big">START <span data-ic="heart" style="display:inline-block;width:1.2em;height:1em;color:#ff8fbb"></span></button></div>
+  <div id="pauseUi" class="hidden"><h2>PAUSED</h2><button id="resumeBtn" class="pbtn">RESUME</button><button id="restartBtn" class="pbtn">RESTART</button></div>
+</div>
+
+<div id="topbar">
+  <div id="music" role="group" aria-label="Music player">
+    <button id="mPlay" class="mbtn" aria-label="Play music"></button>
+    <div class="minfo"><div id="mLab">LOADING</div><div class="mtitle"><div class="mtrack"><span>honeybee - Olivia Rodrigo</span><span>honeybee - Olivia Rodrigo</span></div></div></div>
+    <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <button id="mDrawer" class="mbtn hidden" aria-label="Show Spotify player" data-ic="list" style="padding:calc(var(--pu)*3px)"></button>
+  </div>
+  <div id="hudBtns">
+    <button id="bSfx" class="hb" aria-label="Sound effects on or off" data-ic="sfxOn"></button>
+    <button id="bPause" class="hb" aria-label="Pause game" data-ic="pause"></button>
+  </div>
+  <div id="spBox"><div><div id="spHost"></div></div><div id="spNote">This is the Spotify player for the song.</div><a class="spl" href="https://open.spotify.com/track/407LgLkk1uM3wMO6jVRe0a" target="_blank" rel="noopener">open in spotify</a></div>
+</div>
+
+<div id="controls">
+  <div id="dpad" role="group" aria-label="Move left or right"><div class="arr" data-d="left" data-ic="left"></div><div class="arr" data-d="right" data-ic="right"></div></div>
+  <button id="jumpBtn" aria-label="Jump"><span data-ic="up" style="display:block;width:34%"></span>JUMP</button>
+</div>
+
+<section id="final" class="hidden" aria-label="Happy birthday Medo">
+  <canvas id="fbg"></canvas>
+  <div class="fscroll"><div class="fin">
+    <h1 class="ftitle" id="fTitle" aria-label="Happy birthday Medo"></h1>
+    <div class="fstage" id="fStage">
+      <div class="medoCol" id="medoCol"><canvas id="fmedo" width="40" height="76"></canvas></div>
+      <div class="bqCol" id="bqCol"><canvas id="fbq" width="150" height="180"></canvas><canvas id="fbqfx" width="150" height="180"></canvas></div>
+      <div class="envCol" id="envCol">
+        <img class="eimg" id="eBack" alt="">
+        <img class="eimg" id="eUp" alt="">
+        <div class="letter" id="letter"><div class="tape"></div><div class="paper" id="paper"></div><div class="creases"><i></i><i></i></div></div>
+        <img class="eimg" id="eFront" alt="">
+        <img class="eimg" id="eDown" alt="">
+      </div>
+    </div>
+    <div id="fBtns"><button id="againBtn" class="pbtn">PLAY AGAIN</button><button id="replayBtn" class="pbtn">REPLAY SURPRISE</button></div>
+  </div></div>
+</section>
+
+<script>
+/*__SCRIPT__*/
+</script>
+</body>
+</html>
